@@ -12,9 +12,21 @@ export default function Home() {
         placeholder="Paste YouTube URL"
         style={{ marginRight: 8, padding: 4 }}
       />
-      <button onClick={() => alert('Backend not yet implemented')}>
-        Generate Clips
-      </button>
-    </div>
-  );
-}
+      <button
+  onClick={async () => {
+    if (!url) return alert("Paste a YouTube URL first");
+    try {
+      const res = await fetch("https://<your-backend-url>.onrender.com/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url }),
+      });
+      const data = await res.json();
+      alert("Response from backend: " + JSON.stringify(data));
+    } catch (err) {
+      alert("Error connecting to backend: " + err.message);
+    }
+  }}
+>
+  Generate Clips
+</button>
