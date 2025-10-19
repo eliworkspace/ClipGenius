@@ -5,52 +5,60 @@ export default function Home() {
   const [clips, setClips] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  async function handleGenerate() {
-    if (!url) return alert("Please enter a YouTube URL");
+  const handleGenerateClips = async () => {
+    if (!url) return alert("Please paste a YouTube URL");
+
     setLoading(true);
     try {
-      const res = await fetch("https://clipgenius-1-ddsz.onrender.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
-      });
-      const data = await res.json();
-      setClips(data.clips || []);
+      const response = await fetch(
+        "https://clipgenius-1-ddsz.onrender.com",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Backend error");
+
+      const data = await response.json();
+      setClips(data.clips);
     } catch (err) {
-      alert("Error connecting to backend");
       console.error(err);
-    } finally {
-      setLoading(false);
+      alert("Error contacting backend");
     }
-  }
+    setLoading(false);
+  };
 
   return (
-    <div style={{ padding: 24, color: "black" }}>
-      <h1>🎬 ClipGenius — Auto Clip Generator</h1>
+    <div style={{ padding: 24, fontFamily: "sans-serif", color: "#000" }}>
+      <h1>ClipGenius</h1>
+      <p>Paste a YouTube URL below and generate clips:</p>
+
       <input
+        style={{ padding: 8, width: "300px" }}
         value={url}
         onChange={(e) => setUrl(e.target.value)}
         placeholder="Paste YouTube URL"
-        style={{ width: "60%", padding: 10, marginRight: 10 }}
       />
-      <button onClick={handleGenerate} disabled={loading}>
+
+      <button
+        style={{ padding: "8px 16px", marginLeft: 8 }}
+        onClick={handleGenerateClips}
+        disabled={loading}
+      >
         {loading ? "Generating..." : "Generate Clips"}
       </button>
 
-      <div style={{ marginTop: 20 }}>
-        {clips.map((clip, i) => (
-          <div
-            key={i}
-            style={{
-              border: "1px solid gray",
-              padding: 10,
-              marginBottom: 8,
-              borderRadius: 6,
-            }}
-          >
-            <strong>{clip.title}</strong> — {clip.start}s to {clip.end}s
-          </div>
-        ))}
+      <div style={{ marginTop: 24 }}>
+        {clips.length > 0 && <h2>Generated Clips:</h2>}
+        <ul>
+          {clips.map((clip, idx) => (
+            <li key={idx}>
+              {clip.title}: {clip.start}s - {clip.end}s
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
