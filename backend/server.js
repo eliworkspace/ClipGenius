@@ -2,29 +2,27 @@ import express from "express";
 import cors from "cors";
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json({ limit: "50mb" }));
 app.use(cors());
-app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("✅ ClipGenius Backend is Live!");
-});
+// Test endpoint
+app.get("/", (req, res) => res.send("ClipGenius backend OK"));
 
+// POST endpoint to accept YouTube URLs
 app.post("/", (req, res) => {
   const { url } = req.body;
+  if (!url) return res.status(400).json({ error: "No URL provided" });
 
-  if (!url) {
-    return res.status(400).json({ error: "Missing YouTube URL" });
-  }
-
-  // Fake AI response (temporary demo)
+  // Placeholder clips
   const clips = [
-    { title: "🔥 Intense moment", start: 15, end: 30 },
-    { title: "💡 Key highlight", start: 45, end: 60 },
-    { title: "🏀 Best play", start: 75, end: 90 },
+    { title: "Clip 1", start: 0, end: 15 },
+    { title: "Clip 2", start: 16, end: 30 },
+    { title: "Clip 3", start: 31, end: 45 },
   ];
 
-  res.json({ success: true, url, clips });
+  res.json({ url, clips });
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
