@@ -1,12 +1,11 @@
-import { useState } from 'react';
-export default function Home() {
-  const [url, setUrl] = useState('');
-  return (
-    <div style={{ padding: 24, color: 'black' }}>
-      <h1>ClipGenius — Coming Soon</h1>
-      <input value={url} onChange={e=>setUrl(e.target.value)} placeholder="Paste YouTube URL"/>
-      <button onClick={()=>alert('Backend not yet implemented')}>Generate Clips</button>
-    </div>
-  );
-}
-Add backend server.js
+import express from "express";
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.get("/", (req, res) => {
+  res.send("ClipGenius backend OK");
+});
+
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+});
