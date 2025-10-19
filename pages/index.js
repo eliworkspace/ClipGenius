@@ -16,7 +16,7 @@ export default function Home() {
   onClick={async () => {
     if (!url) return alert("Paste a YouTube URL first");
     try {
-      const res = await fetch("https://<your-backend-url>.onrender.com/", {
+      const res = await fetch("https://clipgenius-1-ddsz.onrender.com/", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url }),
