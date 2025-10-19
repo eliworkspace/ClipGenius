@@ -26,4 +26,3 @@ app.post("/", (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
-npm install cors
