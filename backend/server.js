@@ -1,48 +1,48 @@
-// backend/server.js — FINAL VERSION
 import express from "express";
 import cors from "cors";
 import ytdl from "ytdl-core";
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(express.json({ limit: "50mb" }));
 app.use(cors());
-app.use(express.json());
 
-// ✅ Test route
-app.get("/", (req, res) => res.send("✅ ClipGenius backend is live!"));
+// Test endpoint to make sure backend is live
+app.get("/", (req, res) => {
+  res.send("ClipGenius backend OK");
+});
 
-// ✅ Generate Clips route
-app.post("/generate-clips", async (req, res) => {
+// Endpoint to generate clips from YouTube URL
+app.post("/generate", async (req, res) => {
   try {
-    const { youtubeUrl } = req.body;
+    const { url } = req.body;
+    if (!url) return res.status(400).json({ error: "No URL provided" });
 
-    // Validate YouTube link
-    if (!youtubeUrl || !ytdl.validateURL(youtubeUrl)) {
+    // Validate YouTube URL
+    if (!ytdl.validateURL(url)) {
       return res.status(400).json({ error: "Invalid YouTube URL" });
     }
 
-    // Fetch video info
-    const info = await ytdl.getInfo(youtubeUrl);
-    const lengthSeconds = parseInt(info.videoDetails.lengthSeconds, 10);
-    const title = info.videoDetails.title;
+    // Get video info
+    const info = await ytdl.getInfo(url);
+    const durationSeconds = parseInt(info.videoDetails.lengthSeconds);
 
-    // Split into 15-second clips
-    const clipDuration = 15;
+    // Example: split video into 15-second clips
     const clips = [];
-    for (let start = 0; start < lengthSeconds; start += clipDuration) {
-      const end = Math.min(start + clipDuration, lengthSeconds);
-      clips.push({
-        title: `${title} — Clip ${clips.length + 1}`,
-        start,
-        end,
-      });
+    for (let start = 0; start < durationSeconds; start += 15) {
+      let end = start + 15;
+      if (end > durationSeconds) end = durationSeconds;
+      clips.push({ title: `Clip ${clips.length + 1}`, start, end });
     }
 
-    res.json({ success: true, clips });
+    res.json({ url, clips });
   } catch (error) {
-    console.error("Error generating clips:", error);
+    console.error(error);
     res.status(500).json({ error: "Failed to process video" });
   }
 });
 
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`✅ ClipGenius backend running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
+});
