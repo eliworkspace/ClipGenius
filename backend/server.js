@@ -1,45 +1,31 @@
+// backend/server.js
 import express from "express";
 import cors from "cors";
-import ytdl from "ytdl-core";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
-app.use(express.json({ limit: "50mb" }));
 app.use(cors());
+app.use(express.json());
 
-// ✅ Test route
 app.get("/", (req, res) => {
-  res.send("ClipGenius backend is running ✅");
+  res.send("✅ Backend is live and working!");
 });
 
-// ✅ Generate clips from a YouTube URL
-app.post("/generate", async (req, res) => {
-  try {
-    const { url } = req.body;
-    if (!url || !ytdl.validateURL(url)) {
-      return res.status(400).json({ error: "Invalid YouTube URL" });
-    }
+// Main route for generating clips
+app.post("/generate-clips", async (req, res) => {
+  const { youtubeUrl } = req.body;
 
-    const info = await ytdl.getInfo(url);
-    const title = info.videoDetails.title;
-    const lengthSeconds = parseInt(info.videoDetails.lengthSeconds);
+  console.log("Received YouTube URL:", youtubeUrl);
 
-    // Break the video into 15-second clips
-    const clips = [];
-    for (let start = 0; start < lengthSeconds; start += 15) {
-      clips.push({
-        title: `${title} - Clip ${Math.floor(start / 15) + 1}`,
-        start,
-        end: Math.min(start + 15, lengthSeconds),
-      });
-    }
+  // Mock response — just pretend we generated clips
+  const clips = [
+    { id: 1, start: 0, end: 15 },
+    { id: 2, start: 16, end: 30 },
+    { id: 3, start: 31, end: 45 },
+  ];
 
-    res.json({ success: true, url, clips });
-  } catch (error) {
-    console.error("Error generating clips:", error);
-    res.status(500).json({ error: "Failed to process video" });
-  }
+  // Respond with mock data
+  res.json({ success: true, clips });
 });
 
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => console.log(`✅ Backend running on port ${PORT}`));
